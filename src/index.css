@@ -32,12 +32,10 @@
   z-index: 10;
 }
 
-/* Dark mode transitions */
 .dark {
   @apply transition-colors duration-200;
 }
 
-/* Ensure text remains readable on custom backgrounds */
 body {
   transition: background-color 0.3s ease;
 }
