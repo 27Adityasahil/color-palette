@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.color-swatch {
+  @apply w-16 h-16 rounded-lg cursor-pointer transition-transform hover:scale-105;
+}
+
+.gradient-preview {
+  @apply w-full h-32 rounded-lg mb-4;
+}
+
+.color-wheel .react-colorful {
+  @apply w-full max-w-xs;
+}
+
+.shade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.social-link {
+  @apply text-gray-600 hover:text-gray-900 transition-colors;
+}
+
+.modal-overlay {
+  z-index: 1000;
+}
+
+.color-picker-container {
+  z-index: 10;
+}
+
+/* Dark mode transitions */
+.dark {
+  @apply transition-colors duration-200;
+}
+
+/* Ensure text remains readable on custom backgrounds */
+body {
+  transition: background-color 0.3s ease;
+}
