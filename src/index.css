@@ -7,11 +7,15 @@
 }
 
 .gradient-preview {
-  @apply w-full h-32 rounded-lg mb-4;
+  @apply w-full h-32 rounded-lg mb-4 transition-all duration-300;
+}
+
+.color-wheel {
+  @apply flex justify-center;
 }
 
 .color-wheel .react-colorful {
-  @apply w-full max-w-xs;
+  @apply w-64 mx-auto;
 }
 
 .shade-grid {
@@ -32,10 +36,27 @@
   z-index: 10;
 }
 
+/* Dark mode transitions */
 .dark {
   @apply transition-colors duration-200;
 }
 
+/* Ensure text remains readable on custom backgrounds */
 body {
   transition: background-color 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .color-swatch {
+    @apply w-12 h-12;
+  }
+  
+  .gradient-preview {
+    @apply h-24;
+  }
+  
+  .color-wheel .react-colorful {
+    @apply w-48;
+  }
 }
