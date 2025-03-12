@@ -20,8 +20,9 @@
 
 .shade-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 1rem;
+  width: 100%;
 }
 
 .social-link {
@@ -36,17 +37,17 @@
   z-index: 10;
 }
 
-/* Dark mode transitions */
+
 .dark {
   @apply transition-colors duration-200;
 }
 
-/* Ensure text remains readable on custom backgrounds */
+
 body {
   transition: background-color 0.3s ease;
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 640px) {
   .color-swatch {
     @apply w-12 h-12;
@@ -58,5 +59,10 @@ body {
   
   .color-wheel .react-colorful {
     @apply w-48;
+  }
+
+  .shade-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 0.5rem;
   }
 }

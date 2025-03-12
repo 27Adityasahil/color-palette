@@ -37,10 +37,12 @@ function ColorGame() {
 function App() {
   const [selectedColor, setSelectedColor] = useState('#FF0000');
   const [showShades, setShowShades] = useState(false);
-  const [gradientColor1, setGradientColor1] = useState('#FF0000');
-  const [gradientColor2, setGradientColor2] = useState('#0000FF');
-  const [gradientColor3, setGradientColor3] = useState('#00FF00');
-  const [useThreeColors, setUseThreeColors] = useState(false);
+  const [gradientColors, setGradientColors] = useState([
+    '#FF0000',
+    '#0000FF',
+    '#00FF00'
+  ]);
+  const [numberOfColors, setNumberOfColors] = useState(2);
   const [gradientDirection, setGradientDirection] = useState('to right');
   const [copiedColor, setCopiedColor] = useState('');
   const [funColor, setFunColor] = useState('#FF0000');
@@ -53,6 +55,18 @@ function App() {
     document.documentElement.classList.toggle('dark', isDarkMode);
     document.body.style.backgroundColor = pageColor;
   }, [isDarkMode, pageColor]);
+
+  useEffect(() => {
+    const newColors = [...gradientColors];
+    if (numberOfColors > gradientColors.length) {
+      for (let i = gradientColors.length; i < numberOfColors; i++) {
+        newColors.push(chroma.random().hex());
+      }
+    } else if (numberOfColors < gradientColors.length) {
+      newColors.splice(numberOfColors);
+    }
+    setGradientColors(newColors);
+  }, [numberOfColors]);
 
   const generateShades = (color) => {
     return chroma.scale(['white', color, 'black']).mode('lch').colors(9);
@@ -74,19 +88,22 @@ function App() {
   };
 
   const getGradientStyle = () => {
-    const colors = useThreeColors 
-      ? `${gradientColor1}, ${gradientColor2}, ${gradientColor3}`
-      : `${gradientColor1}, ${gradientColor2}`;
-    return `linear-gradient(${gradientDirection}, ${colors})`;
+    return `linear-gradient(${gradientDirection}, ${gradientColors.join(', ')})`;
   };
 
   const getCssCode = () => {
     return `.gradient {\n  background: ${getGradientStyle()};\n  /* For older browsers */\n  background: -webkit-${getGradientStyle()};\n  background: -moz-${getGradientStyle()};\n}`;
   };
 
+  const handleColorChange = (index, color) => {
+    const newColors = [...gradientColors];
+    newColors[index] = color;
+    setGradientColors(newColors);
+  };
+
   useEffect(() => {
-    if (useFunColorInGradient) {
-      setGradientColor2(funColor);
+    if (useFunColorInGradient && gradientColors.length > 1) {
+      handleColorChange(1, funColor);
     }
   }, [funColor, useFunColorInGradient]);
 
@@ -120,7 +137,6 @@ function App() {
 
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Gradient Preview */}
           <div className="mb-8">
             <div
               className="gradient-preview"
@@ -146,58 +162,58 @@ function App() {
               </div>
             )}
           </div>
-
-          {/* Gradient Controls */}
           <div className="mb-8">
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="flex-1">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Color 1</label>
-                <HexColorPicker color={gradientColor1} onChange={setGradientColor1} />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Color 2</label>
-                <HexColorPicker color={gradientColor2} onChange={setGradientColor2} />
-              </div>
-              {useThreeColors && (
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Color 3</label>
-                  <HexColorPicker color={gradientColor3} onChange={setGradientColor3} />
+            <div className="flex flex-col gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <div className="w-full sm:w-48">
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Number of Colors
+                  </label>
+                  <select
+                    value={numberOfColors}
+                    onChange={(e) => setNumberOfColors(Number(e.target.value))}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    {[...Array(10)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1} {i === 0 ? 'Color' : 'Colors'}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              )}
-            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start mb-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="useThreeColors"
-                  checked={useThreeColors}
-                  onChange={(e) => setUseThreeColors(e.target.checked)}
-                  className="mr-2"
-                />
-                <label htmlFor="useThreeColors" className="text-gray-700 dark:text-gray-300">
-                  Use three colors
-                </label>
+                <div className="flex-grow">
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Gradient Direction
+                  </label>
+                  <select
+                    value={gradientDirection}
+                    onChange={(e) => setGradientDirection(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  >
+                    {gradientDirections.map(({ value, label }) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="flex-grow">
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  Gradient Direction
-                </label>
-                <select
-                  value={gradientDirection}
-                  onChange={(e) => setGradientDirection(e.target.value)}
-                  className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  {gradientDirections.map(({ value, label }) => (
-                    <option key={value} value={value}>{label}</option>
-                  ))}
-                </select>
+              <div className={`grid ${numberOfColors <= 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-5'} gap-4`}>
+                {gradientColors.map((color, index) => (
+                  <div key={index} className="flex-1">
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Color {index + 1}
+                    </label>
+                    <HexColorPicker
+                      color={color}
+                      onChange={(newColor) => handleColorChange(index, newColor)}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-
-          {/* Predefined Colors */}
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Sample Colors</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -216,8 +232,6 @@ function App() {
               ))}
             </div>
           </div>
-
-          {/* Fun Color Wheel */}
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-white">Fun Color Wheel</h2>
             <div className="flex flex-col items-center">
@@ -238,8 +252,6 @@ function App() {
               </div>
             </div>
           </div>
-
-          {/* Color Game Button */}
           <div className="text-center mb-8">
             <button
               onClick={ColorGame}
@@ -254,13 +266,13 @@ function App() {
       <footer className="bg-white dark:bg-gray-800 shadow-sm py-6">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center space-x-6">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
+            <a href="https://github.com/27Adityasahil" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
               GitHub
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
+            <a href="https://www.instagram.com/saditya_27" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
               Instagram
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
+            <a href="https://www.linkedin.com/in/adityar27/" target="_blank" rel="noopener noreferrer" className="social-link dark:text-gray-400 dark:hover:text-white">
               LinkedIn
             </a>
           </div>
@@ -268,7 +280,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Shades Modal */}
       {showShades && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-overlay">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full">
